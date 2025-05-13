@@ -21,9 +21,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".student.StudentDashboard"
+            android:name=".ChatActivity"
             android:exported="false"
             android:theme="@style/Theme.EDTRACK"/>
+        <activity
+            android:name=".student.StudentDashboard"
+            android:exported="false"
+            android:theme="@style/Theme.EDTRACK" />
         <activity
             android:name=".AddCourseActivity"
             android:exported="false"

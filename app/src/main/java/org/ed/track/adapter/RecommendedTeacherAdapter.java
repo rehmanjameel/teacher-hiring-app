@@ -1,10 +1,12 @@
 package org.ed.track.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import org.ed.track.ChatActivity;
 import org.ed.track.R;
 import org.ed.track.model.UserProfile;
 
@@ -49,7 +52,7 @@ public class RecommendedTeacherAdapter extends RecyclerView.Adapter<RecommendedT
         holder.areaText.setText(teacher.getLocation());
         holder.qualificationText.setText(teacher.getQualification());
 
-        Log.e("name", "onBindViewHolder: " + teacher.getName());
+        Log.e("name", "onBindViewHolder: " + teacher.getName() + " id: " + teacher.getUserId());
         // Load profile image (if available)
         if (teacher.getImageUrl() != null && !teacher.getImageUrl().isEmpty()) {
             Glide.with(context)
@@ -57,6 +60,13 @@ public class RecommendedTeacherAdapter extends RecyclerView.Adapter<RecommendedT
                     .placeholder(R.drawable.baseline_person_24)
                     .into(holder.profileImage);
         }
+        holder.messageTeacher.setOnClickListener(v -> {
+            // Handle message teacher button click
+            Intent intent = new Intent(context, ChatActivity.class);
+            intent.putExtra("receiverId", teacher.getUserId());
+            context.startActivity(intent);
+        });
+
     }
 
     @Override
@@ -67,6 +77,7 @@ public class RecommendedTeacherAdapter extends RecyclerView.Adapter<RecommendedT
     public static class TeacherViewHolder extends RecyclerView.ViewHolder {
         TextView nameText, areaText, qualificationText;
         CircleImageView profileImage;
+        ImageView messageTeacher;
 
         public TeacherViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,6 +85,7 @@ public class RecommendedTeacherAdapter extends RecyclerView.Adapter<RecommendedT
             areaText = itemView.findViewById(R.id.teacher_area);
             qualificationText = itemView.findViewById(R.id.teacher_qualification);
             profileImage = itemView.findViewById(R.id.teacher_image);
+            messageTeacher = itemView.findViewById(R.id.messageTeacher);
         }
     }
 }

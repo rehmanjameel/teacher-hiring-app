@@ -62,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
         intent.putExtra("is_login", true);
         intent.putExtra("phone", binding.ccp.getSelectedCountryCodeWithPlus() + phone);
         startActivity(intent);
+        binding.progressBar.setVisibility(View.GONE);
 //        loginUser(binding.ccp.getSelectedCountryCodeWithPlus() + phone, password);
     }
 

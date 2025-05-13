@@ -2,6 +2,7 @@ package org.ed.track.model;
 
 public class UserProfile {
     // common fields
+    private String userId;
     private String name;
     private String email;
     private String location;
@@ -24,6 +25,15 @@ public class UserProfile {
     }
 
     // Getters and setters...
+
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
 
     public String getRole() {
         return role;

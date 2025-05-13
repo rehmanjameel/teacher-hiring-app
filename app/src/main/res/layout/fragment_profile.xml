@@ -68,12 +68,23 @@
             android:layout_marginTop="10dp"/>
 
         <TextView
-            android:id="@+id/qualificationTxt"
+            android:id="@+id/subjectTxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Qualification"
+            android:text="Subject"
             android:textStyle="bold"
             android:textSize="16sp"
+            android:visibility="gone"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/budgetTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Budget"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:visibility="gone"
             android:layout_marginTop="10dp"/>
 
         <TextView
@@ -81,6 +92,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Address"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginTop="10dp"/>
+
+        <TextView
+            android:id="@+id/qualificationTxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Qualification"
             android:textStyle="bold"
             android:textSize="16sp"
             android:layout_marginTop="10dp"/>

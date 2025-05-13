@@ -235,46 +235,85 @@ public class PhoneVerificationActivity extends AppCompatActivity {
     private void fetchUserProfileForLogin(String phone) {
 
         FirebaseFirestore.getInstance().collection("users")
-                .whereEqualTo("phone", phone)
                 .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    Log.e("profile data", documentSnapshot.toString());
-                    if (!documentSnapshot.isEmpty()) {
+                .addOnSuccessListener(snapshot -> {
+                    for (DocumentSnapshot userDoc : snapshot.getDocuments()) {
+                        Log.e("USER", "Phone: " + userDoc.getString("phone") + "name: " +
+                                userDoc.getString("name") + " ID: " + userDoc.getId());
+                        if (userDoc.getString("phone").equals(phone)) {
+                            Toast.makeText(App.getContext(), "User found", Toast.LENGTH_SHORT).show();
+                            App.saveLogin(true);
+                            App.saveString("user_id", userDoc.getId());
+                            App.saveString("phone", phone);
+                            App.saveString("password", password);
+                            App.saveString("role", userDoc.getString("role"));
+                            App.saveString("name", userDoc.getString("name"));
+                            App.saveString("email", userDoc.getString("email"));
+                            App.saveString("location", userDoc.getString("location"));
+                            App.saveString("profileImageUrl", userDoc.getString("imageUrl"));
+                            if (App.getString("role").equals("Teacher")) {
+                                App.saveBoolean("is_teacher", true);
+                                App.saveString("qualification", userDoc.getString("qualification"));
+                                App.saveString("bio", userDoc.getString("bio"));
+                                App.saveString("availableTime", userDoc.getString("availableTime"));
+                                startActivity(new Intent(this, DashBoardActivity.class));
 
-                        DocumentSnapshot userDoc = documentSnapshot.getDocuments().get(0);
-                        String userId = userDoc.getId();
-                        Log.d("Login", "Login successful. User ID: " + userId);
+                            } else {
+                                App.saveBoolean("is_teacher", false);
+                                App.saveString("budget", userDoc.getString("budget"));
+                                App.saveString("subject", userDoc.getString("subject"));
+                                startActivity(new Intent(this, StudentDashboard.class));
 
-                        App.saveLogin(true);
-                        App.saveString("user_id", userId);
-                        App.saveString("phone", phone);
-                        App.saveString("password", password);
-                        App.saveString("role", userDoc.getString("role"));
-                        App.saveString("name", userDoc.getString("name"));
-                        App.saveString("email", userDoc.getString("email"));
-                        App.saveString("location", userDoc.getString("location"));
-                        App.saveString("profileImageUrl", userDoc.getString("profileImageUrl"));
-                        if (App.getString("role").equals("Teacher")) {
-                            App.saveBoolean("is_teacher", true);
-                            App.saveString("qualification", userDoc.getString("qualification"));
-                            App.saveString("bio", userDoc.getString("bio"));
-                            App.saveString("availableTime", userDoc.getString("availableTime"));
-                            startActivity(new Intent(this, DashBoardActivity.class));
-
-                        } else {
-                            App.saveBoolean("is_teacher", false);
-                            App.saveString("budget", userDoc.getString("budget"));
-                            App.saveString("subject", userDoc.getString("subject"));
-                            startActivity(new Intent(this, StudentDashboard.class));
+                            }
 
                         }
-                    } else {
-                        Toast.makeText(App.getContext(), "User profile not found", Toast.LENGTH_SHORT).show();
                     }
-                })
-                .addOnFailureListener(e -> {
+                }).addOnFailureListener(e -> {
                     Toast.makeText(App.getContext(), "Failed to load profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
+
+//        Log.e("verified numb", phone);
+//        FirebaseFirestore.getInstance().collection("users")
+//                .whereEqualTo("phone", phone.trim())
+//                .get()
+//                .addOnSuccessListener(documentSnapshot -> {
+//                    Log.e("profile data", documentSnapshot.toString() + " ,.,., "+documentSnapshot.size());
+//                    if (!documentSnapshot.isEmpty()) {
+//
+//                        DocumentSnapshot userDoc = documentSnapshot.getDocuments().get(0);
+//                        String userId = userDoc.getId();
+//                        Log.d("Login", "Login successful. User ID: " + userId);
+//
+//                        App.saveLogin(true);
+//                        App.saveString("user_id", userId);
+//                        App.saveString("phone", phone);
+//                        App.saveString("password", password);
+//                        App.saveString("role", userDoc.getString("role"));
+//                        App.saveString("name", userDoc.getString("name"));
+//                        App.saveString("email", userDoc.getString("email"));
+//                        App.saveString("location", userDoc.getString("location"));
+//                        App.saveString("profileImageUrl", userDoc.getString("profileImageUrl"));
+//                        if (App.getString("role").equals("Teacher")) {
+//                            App.saveBoolean("is_teacher", true);
+//                            App.saveString("qualification", userDoc.getString("qualification"));
+//                            App.saveString("bio", userDoc.getString("bio"));
+//                            App.saveString("availableTime", userDoc.getString("availableTime"));
+//                            startActivity(new Intent(this, DashBoardActivity.class));
+//
+//                        } else {
+//                            App.saveBoolean("is_teacher", false);
+//                            App.saveString("budget", userDoc.getString("budget"));
+//                            App.saveString("subject", userDoc.getString("subject"));
+//                            startActivity(new Intent(this, StudentDashboard.class));
+//
+//                        }
+//                    } else {
+//                        Toast.makeText(App.getContext(), "User profile not found", Toast.LENGTH_SHORT).show();
+//                    }
+//                })
+//                .addOnFailureListener(e -> {
+//                    Toast.makeText(App.getContext(), "Failed to load profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                });
     }
 
 }

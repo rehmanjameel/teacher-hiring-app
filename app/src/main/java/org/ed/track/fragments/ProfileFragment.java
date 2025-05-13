@@ -1,5 +1,6 @@
 package org.ed.track.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -17,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import org.ed.track.R;
 import org.ed.track.model.UserProfile;
 import org.ed.track.databinding.FragmentProfileBinding;
+import org.ed.track.register.LoginActivity;
 import org.ed.track.utils.App;
 
 public class ProfileFragment extends Fragment {
@@ -35,6 +37,7 @@ public class ProfileFragment extends Fragment {
         binding.logoutBtn.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             App.logout();
+            startActivity(new Intent(App.getContext(), LoginActivity.class));
             getActivity().finish();
         });
 
@@ -46,15 +49,16 @@ public class ProfileFragment extends Fragment {
         super.onResume();
         user = new UserProfile();
 
+
         binding.userName.setText(App.getString("name"));
         binding.emailTxt.setText(App.getString("email"));
         binding.locationTxt.setText(App.getString("location"));
+        binding.phoneTxt.setText(App.getString("phone"));
         binding.qualificationTxt.setText(App.getString("qualification"));
         binding.aboutTxt.setText(App.getString("bio"));
-        binding.phoneTxt.setText(App.getString("phone"));
 
         // Load profile image (e.g., using Glide)
-        Glide.with(this).load(App.getString("profile_image")).error(R.drawable.baseline_person_24).into(binding.profileImage);
+        Glide.with(this).load(App.getString("profileImageUrl")).error(R.drawable.baseline_person_24).into(binding.profileImage);
 
     }
 

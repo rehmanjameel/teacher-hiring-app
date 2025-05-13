@@ -1,5 +1,6 @@
 package org.ed.track.student.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,14 +14,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.auth.User;
 
+import org.ed.track.DashBoardActivity;
 import org.ed.track.R;
 import org.ed.track.adapter.RecommendedTeacherAdapter;
 import org.ed.track.databinding.FragmentStudentHomeBinding;
 import org.ed.track.model.UserProfile;
+import org.ed.track.student.StudentDashboard;
 import org.ed.track.utils.App;
 
 import java.util.ArrayList;
@@ -32,6 +37,7 @@ public class StudentHomeFragment extends Fragment {
 
     private FragmentStudentHomeBinding binding;
     private RecommendedTeacherAdapter recommendedTeacherAdapter;
+    private RecommendedTeacherAdapter allTeachersAdapter;
     private List<UserProfile> teacherList = new ArrayList<>();
 
     @Override
@@ -68,10 +74,13 @@ public class StudentHomeFragment extends Fragment {
                                         Log.e("in area part", "in area " + userDoc.getString("location"));
 
                                         if (userDoc.exists()) {
-                                            Log.e("in area part", "in area " + userDoc.getString("location"));
+                                            Log.e("in area part", "in area " + userDoc.getString("location") + " user id: " + userDoc.getId());
                                             String teacherArea = userDoc.getString("location");
                                             if (studentArea.equalsIgnoreCase(teacherArea)) {
+                                                binding.progressBar.setVisibility(View.GONE);
+
                                                 UserProfile teacher = userDoc.toObject(UserProfile.class);
+                                                teacher.setUserId(userDoc.getId());
                                                 recommendedTeachers.add(teacher);
                                                 recommendedTeacherAdapter.updateList(recommendedTeachers);
                                             }
@@ -83,6 +92,8 @@ public class StudentHomeFragment extends Fragment {
                     }
                 })
                 .addOnFailureListener(e -> {
+                    binding.progressBar.setVisibility(View.GONE);
+
                     Toast.makeText(App.getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
@@ -112,6 +123,49 @@ public class StudentHomeFragment extends Fragment {
         }
     }
 
+    private void getAllTeachers() {
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        List<UserProfile> allTeachers = new ArrayList<>();
+
+        db.collection("users")
+                .whereEqualTo("role", "Teacher")
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+
+                            if (!documentSnapshot.isEmpty()) {
+                                Toast.makeText(App.getContext(), "Teachers found", Toast.LENGTH_SHORT).show();
+                                DocumentSnapshot userDoc = documentSnapshot.getDocuments().get(0);
+                                String userId = userDoc.getId();
+                                Log.d("Login", "Login successful. User ID: " + userId);
+
+                                UserProfile teacher = userDoc.toObject(UserProfile.class);
+                                teacher.setUserId(userId);
+                                allTeachers.add(teacher);
+                                allTeachersAdapter.updateList(allTeachers);
+
+                                binding.progressBar.setVisibility(View.GONE);
+
+                                // Save login state or go to next activity
+                            } else {
+                                // No user found
+                                binding.progressBar.setVisibility(View.GONE);
+
+                                Log.d("Login", "Invalid phone or password.");
+                                Toast.makeText(App.getContext(), "Teachers not found", Toast.LENGTH_SHORT).show();
+                            }
+                            binding.progressBar.setVisibility(View.GONE);
+                        }
+                )
+                .addOnFailureListener(e -> {
+                    binding.progressBar.setVisibility(View.GONE);
+                    Log.e("error", "error: "+e.getMessage());
+
+                    Toast.makeText(App.getContext(), "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+
+
+                });
+    }
 
     @Override
     public void onResume() {
@@ -121,8 +175,14 @@ public class StudentHomeFragment extends Fragment {
         recommendedTeacherAdapter = new RecommendedTeacherAdapter(getContext(), teacherList);
         binding.recyclerViewRecommendedTeachers.setAdapter(recommendedTeacherAdapter);
 
+        binding.recyclerViewAllTeachers.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+        allTeachersAdapter = new RecommendedTeacherAdapter(getContext(), teacherList);
+        binding.recyclerViewAllTeachers.setAdapter(allTeachersAdapter);
+
+        binding.progressBar.setVisibility(View.VISIBLE);
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
 //            binding.btnAddCourse.setVisibility(View.VISIBLE);
+            getAllTeachers();
             fetchRecommendedTeachers(App.getString("location"), App.getString("budget"));
         }, 3000);
 

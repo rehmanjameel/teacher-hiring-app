@@ -2,10 +2,12 @@ package org.ed.track.student;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -52,17 +54,7 @@ public class StudentDashboard extends AppCompatActivity {
 
         binding.bottomNavigation.setOnItemSelectedListener(item -> {
 
-            Fragment selectedFragment = null;
-
-            if (item.getItemId() == R.id.nav_home) {
-                selectedFragment = new StudentHomeFragment();
-            } else if (item.getItemId() == R.id.nav_messages) {
-                selectedFragment = new MessagesFragment();
-            } else if (item.getItemId() == R.id.nav_calendar) {
-                selectedFragment = new CalendarFragment();
-            } else if (item.getItemId() == R.id.nav_profile) {
-                selectedFragment = new ProfileFragment();
-            }
+            Fragment selectedFragment = getFragment(item);
 
             if (selectedFragment != null && !selectedFragment.getClass().equals(currentFragment.getClass())) {
                 currentFragment = selectedFragment;
@@ -97,7 +89,22 @@ public class StudentDashboard extends AppCompatActivity {
             }
         });
 
+    }
 
+    @Nullable
+    private static Fragment getFragment(MenuItem item) {
+        Fragment selectedFragment = null;
+
+        if (item.getItemId() == R.id.nav_home) {
+            selectedFragment = new StudentHomeFragment();
+        } else if (item.getItemId() == R.id.nav_messages) {
+            selectedFragment = new MessagesFragment();
+        } else if (item.getItemId() == R.id.nav_calendar) {
+            selectedFragment = new CalendarFragment();
+        } else if (item.getItemId() == R.id.nav_profile) {
+            selectedFragment = new ProfileFragment();
+        }
+        return selectedFragment;
     }
 
     private void fetchUserProfile() {
@@ -107,7 +114,7 @@ public class StudentDashboard extends AppCompatActivity {
                 .document(userId)
                 .get()
                 .addOnSuccessListener(documentSnapshot -> {
-                    Log.e("profile data", documentSnapshot.toString());
+                    Log.e("student profile data", documentSnapshot.toString());
                     if (documentSnapshot.exists()) {
                         UserProfile user = documentSnapshot.toObject(UserProfile.class);
 
@@ -121,7 +128,7 @@ public class StudentDashboard extends AppCompatActivity {
 //                            App.saveString("phone", user.getPhone());
                             App.saveString("subject", user.getSubject());
                             App.saveString("budget", user.getBudget());
-                            App.saveString("profile_image", user.getImageUrl());
+                            App.saveString("profileImageUrl", user.getImageUrl());
                         }
                     } else {
                         Toast.makeText(App.getContext(), "User profile not found", Toast.LENGTH_SHORT).show();
