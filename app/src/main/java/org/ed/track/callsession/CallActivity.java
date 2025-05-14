@@ -38,8 +38,8 @@ public class CallActivity extends AppCompatActivity {
 
     private ActivityCallBinding binding;
 
-    private String myAppId = "fee36a819c1242498539f9d590e84f51";
-    private String appCertificate = "bf5ff12928b94d28bd536b9d4eda1aee";
+    private String myAppId = "";
+    private String appCertificate = "";
     private RtcEngine mRtcEngine;
 
     private String channelName;
