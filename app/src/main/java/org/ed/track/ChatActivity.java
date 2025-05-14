@@ -20,6 +20,8 @@ import org.ed.track.model.ChatMessage;
 import org.ed.track.utils.App;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ChatActivity extends AppCompatActivity {
@@ -28,6 +30,7 @@ public class ChatActivity extends AppCompatActivity {
     private ChatAdapter chatAdapter;
     private List<ChatMessage> chatMessages;
 
+    private FirebaseFirestore db;
     private String senderId, receiverId, chatId;
 
 // it hink we should getthe CHATS ON THE BASE OF CURRENT USERS as they are
@@ -52,6 +55,8 @@ public class ChatActivity extends AppCompatActivity {
         }
         chatId = getChatId(senderId, receiverId);
 
+        db = FirebaseFirestore.getInstance();
+
         chatMessages = new ArrayList<>();
         chatAdapter = new ChatAdapter(chatMessages, senderId);
         binding.recyclerChat.setAdapter(chatAdapter);
@@ -74,9 +79,9 @@ public class ChatActivity extends AppCompatActivity {
 
         FirebaseFirestore.getInstance()
                 .collection("chats")
-                .document(chatId)
-                .collection("messages")
                 .add(message);
+
+        binding.back.setOnClickListener(view -> onBackPressed());
 
         binding.editMessage.setText("");
     }
@@ -84,14 +89,16 @@ public class ChatActivity extends AppCompatActivity {
     private void listenForMessages() {
         FirebaseFirestore.getInstance()
                 .collection("chats")
-                .document(chatId)
-                .collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener((snapshots, error) -> {
                     if (error != null) return;
 
                     chatMessages.clear();
+
                     for (DocumentSnapshot doc : snapshots) {
+//                        if (doc.getString("receiverId").equals(receiverId) && doc.getString("senderId").equals(senderId) ){
+//
+//                        }
                         ChatMessage msg = doc.toObject(ChatMessage.class);
                         chatMessages.add(msg);
                     }
@@ -99,6 +106,44 @@ public class ChatActivity extends AppCompatActivity {
                     binding.recyclerChat.scrollToPosition(chatMessages.size() - 1);
                 });
     }
+
+//    private void listenForMessages() {
+//        chatMessages.clear();
+//
+//        // Messages sent by current user
+//        db.collection("chats")
+//                .whereEqualTo("senderId", senderId)
+//                .whereEqualTo("receiverId", receiverId)
+//                .orderBy("timestamp", Query.Direction.ASCENDING)
+//                .get()
+//                .addOnSuccessListener(snapshot1 -> {
+//
+//                    for (DocumentSnapshot doc : snapshot1) {
+//                        ChatMessage msg = doc.toObject(ChatMessage.class);
+//                        chatMessages.add(msg);
+//                    }
+//
+//                    // Messages received by current user
+//                    db.collection("chats")
+//                            .whereEqualTo("senderId", receiverId)
+//                            .whereEqualTo("receiverId", senderId)
+//                            .orderBy("timestamp", Query.Direction.ASCENDING)
+//                            .get()
+//                            .addOnSuccessListener(snapshot2 -> {
+//
+//                                for (DocumentSnapshot doc : snapshot2) {
+//                                    ChatMessage msg = doc.toObject(ChatMessage.class);
+//                                    chatMessages.add(msg);
+//                                }
+//
+//                                // Sort all messages by timestamp after merging
+//                                Collections.sort(chatMessages, Comparator.comparingLong(ChatMessage::getTimestamp));
+//                                chatAdapter.notifyDataSetChanged();
+//                                binding.recyclerChat.scrollToPosition(chatMessages.size() - 1);
+//                            });
+//                });
+//    }
+
 
     @Override
     protected void onResume() {

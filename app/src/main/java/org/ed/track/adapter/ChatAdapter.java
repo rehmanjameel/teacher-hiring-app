@@ -1,5 +1,6 @@
 package org.ed.track.adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,10 +36,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         ChatMessage message = messageList.get(position);
         if (message.getSenderId().equals(currentUserId)) {
+            Log.e("sender", "onBindViewHolder: " + message);
             holder.sentMsg.setText(message.getMessage());
             holder.sentMsg.setVisibility(View.VISIBLE);
             holder.receivedMsg.setVisibility(View.GONE);
         } else {
+            Log.e("receiver", "onBindViewHolder: " + message);
+
             holder.receivedMsg.setText(message.getMessage());
             holder.receivedMsg.setVisibility(View.VISIBLE);
             holder.sentMsg.setVisibility(View.GONE);
