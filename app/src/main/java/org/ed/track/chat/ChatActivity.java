@@ -1,28 +1,26 @@
-package org.ed.track;
+package org.ed.track.chat;
 
+import android.content.Intent;
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import org.ed.track.adapter.ChatAdapter;
+import org.ed.track.callsession.CallActivity;
 import org.ed.track.databinding.ActivityChatBinding;
 import org.ed.track.model.ChatMessage;
 import org.ed.track.utils.App;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChatActivity extends AppCompatActivity {
 
@@ -31,15 +29,7 @@ public class ChatActivity extends AppCompatActivity {
     private List<ChatMessage> chatMessages;
 
     private FirebaseFirestore db;
-    private String senderId, receiverId, chatId;
-
-// it hink we should getthe CHATS ON THE BASE OF CURRENT USERS as they are
-//    linked wiht chat id student or teacher. i want to show the list of chats
-//    in chats activity when user open the chat it will redirect the main
-//    chat activity according to id of student or teacher if it contains in
-//    that chat..so for that i will need the spearate adapter and layout where
-//    we can show the image of other persoen student or teacher on chatsactivity
-//    where chats list will be available
+    private String senderId, receiverId, chatId, callChannelName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +44,7 @@ public class ChatActivity extends AppCompatActivity {
             return;
         }
         chatId = getChatId(senderId, receiverId);
-
+        callChannelName = "session_" + chatId.hashCode();
         db = FirebaseFirestore.getInstance();
 
         chatMessages = new ArrayList<>();
@@ -63,6 +53,13 @@ public class ChatActivity extends AppCompatActivity {
         binding.recyclerChat.setLayoutManager(new LinearLayoutManager(this));
 
         binding.btnSend.setOnClickListener(v -> sendMessage());
+
+        binding.startCall.setOnClickListener(view -> {
+            Intent intent = new Intent(App.getContext(), CallActivity.class);
+            intent.putExtra("channel_name", callChannelName);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            App.getContext().startActivity(intent);
+        });
 
         listenForMessages();
     }
@@ -77,8 +74,27 @@ public class ChatActivity extends AppCompatActivity {
 
         ChatMessage message = new ChatMessage(senderId, receiverId, msg, System.currentTimeMillis());
 
+//        FirebaseFirestore.getInstance()
+//                .collection("chats")
+//                .document(chatId)
+//                .collection("messages")
+//                .add(message);
+        // 1. Update or create the main chat document
+        Map<String, Object> chatMeta = new HashMap<>();
+        chatMeta.put("participants", Arrays.asList(senderId, receiverId));
+        chatMeta.put("lastMessage", msg);
+        chatMeta.put("timestamp", System.currentTimeMillis());
+
         FirebaseFirestore.getInstance()
                 .collection("chats")
+                .document(chatId)
+                .set(chatMeta);
+
+// 2. Add the message to the messages subcollection
+        FirebaseFirestore.getInstance()
+                .collection("chats")
+                .document(chatId)
+                .collection("messages")
                 .add(message);
 
         binding.back.setOnClickListener(view -> onBackPressed());
@@ -87,25 +103,30 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void listenForMessages() {
+
         FirebaseFirestore.getInstance()
                 .collection("chats")
+                .document(chatId)
+                .collection("messages")
                 .orderBy("timestamp", Query.Direction.ASCENDING)
                 .addSnapshotListener((snapshots, error) -> {
-                    if (error != null) return;
+                    if (error != null || snapshots == null) return;
 
                     chatMessages.clear();
-
                     for (DocumentSnapshot doc : snapshots) {
-//                        if (doc.getString("receiverId").equals(receiverId) && doc.getString("senderId").equals(senderId) ){
-//
-//                        }
                         ChatMessage msg = doc.toObject(ChatMessage.class);
-                        chatMessages.add(msg);
+                        if (msg != null && (
+                                (msg.getSenderId().equals(senderId) && msg.getReceiverId().equals(receiverId)) ||
+                                        (msg.getSenderId().equals(receiverId) && msg.getReceiverId().equals(senderId))
+                        )) {
+                            chatMessages.add(msg);
+                        }
                     }
                     chatAdapter.notifyDataSetChanged();
                     binding.recyclerChat.scrollToPosition(chatMessages.size() - 1);
                 });
     }
+
 
 //    private void listenForMessages() {
 //        chatMessages.clear();

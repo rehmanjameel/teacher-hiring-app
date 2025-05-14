@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import org.ed.track.ChatActivity;
+import org.ed.track.chat.ChatActivity;
 import org.ed.track.R;
 import org.ed.track.model.UserProfile;
 

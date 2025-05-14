@@ -7,6 +7,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -14,8 +15,11 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.ed.track.DashBoardActivity;
 import org.ed.track.R;
@@ -120,6 +124,8 @@ public class StudentDashboard extends AppCompatActivity {
 
                         if (user != null) {
                             // Display the data in your UI
+                            App.saveString("user_id", userId);
+
                             App.saveString("name", user.getName());
                             App.saveString("email", user.getEmail());
                             App.saveString("location", user.getLocation());
@@ -143,5 +149,37 @@ public class StudentDashboard extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         fetchUserProfile();
+        getFCMToken();
+    }
+
+    private void getFCMToken() {
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+            @Override
+            public void onComplete(@NonNull Task<String> task) {
+                if (task.isSuccessful()) {
+                    String token = task.getResult();
+                    Log.e("tokeen", token);
+//                    Toast.makeText(MainActivity.this, "token: " + token, Toast.LENGTH_SHORT).show();
+
+                    saveTokenToFireStore(App.getString("user_id"), token);
+
+                }
+            }
+        });
+    }
+
+    // Assume 'userId' is the user's unique ID and 'token' is the FCM token
+    private void saveTokenToFireStore(String userId, String token) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // Update the token field for the user
+        db.collection("users").document(userId)
+                .update("token", token)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("TAG", "Token saved successfully for user: " + userId);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("TAG", "Failed to save token for user: " + userId, e);
+                });
     }
 }

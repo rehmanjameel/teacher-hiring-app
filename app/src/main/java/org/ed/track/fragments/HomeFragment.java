@@ -16,6 +16,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import org.ed.track.AddCourseActivity;
+import org.ed.track.callsession.CallActivity;
 import org.ed.track.model.CourseModel;
 import org.ed.track.R;
 import org.ed.track.adapter.TeacherCourseAdapter;
@@ -56,6 +57,11 @@ public class HomeFragment extends Fragment {
         binding.btnAddCourse.setOnClickListener(v -> {
             // Open AddCourseActivity or show dialog
             startActivity(new Intent(App.getContext(), AddCourseActivity.class));
+        });
+
+        binding.startCall.setOnClickListener(v -> {
+            // Open AddCourseActivity or show dialog
+            startActivity(new Intent(App.getContext(), CallActivity.class));
         });
 
         return binding.getRoot();

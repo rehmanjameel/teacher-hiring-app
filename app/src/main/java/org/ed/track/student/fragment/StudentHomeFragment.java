@@ -23,6 +23,7 @@ import com.google.firebase.firestore.auth.User;
 import org.ed.track.DashBoardActivity;
 import org.ed.track.R;
 import org.ed.track.adapter.RecommendedTeacherAdapter;
+import org.ed.track.callsession.CallActivity;
 import org.ed.track.databinding.FragmentStudentHomeBinding;
 import org.ed.track.model.UserProfile;
 import org.ed.track.student.StudentDashboard;
@@ -46,8 +47,10 @@ public class StudentHomeFragment extends Fragment {
         // Inflate the layout for this fragment
         binding = FragmentStudentHomeBinding.bind(inflater.inflate(R.layout.fragment_student_home, container, false));
 
-
-
+        binding.startCall.setOnClickListener(v -> {
+            // Open AddCourseActivity or show dialog
+            startActivity(new Intent(App.getContext(), CallActivity.class));
+        });
 
         return binding.getRoot();
     }
@@ -74,9 +77,11 @@ public class StudentHomeFragment extends Fragment {
                                         Log.e("in area part", "in area " + userDoc.getString("location"));
 
                                         if (userDoc.exists()) {
-                                            Log.e("in area part", "in area " + userDoc.getString("location") + " user id: " + userDoc.getId());
-                                            String teacherArea = userDoc.getString("location");
-                                            if (studentArea.equalsIgnoreCase(teacherArea)) {
+                                            Log.e("in area part", "in area " + userDoc.getString("location").toLowerCase() + studentArea + " user id: " + userDoc.getId());
+                                            String teacherArea = userDoc.getString("location").toLowerCase();
+                                            Log.e("in area part00", "in area " + studentArea.equalsIgnoreCase(teacherArea.toLowerCase()));
+
+                                            if (studentArea.equals(teacherArea)) {
                                                 binding.progressBar.setVisibility(View.GONE);
 
                                                 UserProfile teacher = userDoc.toObject(UserProfile.class);
@@ -183,7 +188,7 @@ public class StudentHomeFragment extends Fragment {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
 //            binding.btnAddCourse.setVisibility(View.VISIBLE);
             getAllTeachers();
-            fetchRecommendedTeachers(App.getString("location"), App.getString("budget"));
+            fetchRecommendedTeachers(App.getString("location").toLowerCase(), App.getString("budget"));
         }, 3000);
 
     }

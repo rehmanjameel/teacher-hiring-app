@@ -17,12 +17,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
-import org.ed.track.ChatActivity;
+import org.ed.track.chat.ChatActivity;
 import org.ed.track.R;
 import org.ed.track.adapter.ChatListAdapter;
 import org.ed.track.databinding.FragmentMessagesBinding;
 import org.ed.track.model.ChatListItem;
-import org.ed.track.utils.App;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,7 +47,7 @@ public class MessagesFragment extends Fragment {
 
         binding.chatListRv.setLayoutManager(new LinearLayoutManager(getContext()));
 
-// Initialize list and adapter
+        // Initialize list and adapter
         chatList = new ArrayList<>();
         adapter = new ChatListAdapter(chatList, getContext(), item -> {
             Intent intent = new Intent(getContext(), ChatActivity.class);
@@ -57,17 +56,6 @@ public class MessagesFragment extends Fragment {
         });
 
         binding.chatListRv.setAdapter(adapter);
-
-
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        if (firebaseUser != null) {
-            Log.e("TAG", "getChatList: " + firebaseUser.getUid());
-
-            currentUserId = firebaseUser.getUid();
-            db = FirebaseFirestore.getInstance();
-            getChatList();
-        }
-
 
         return binding.getRoot();
     }
@@ -125,4 +113,59 @@ public class MessagesFragment extends Fragment {
                 });
     }
 
+    private void getChatList(String currentUserId) {
+        chatList.clear();
+        FirebaseFirestore.getInstance()
+                .collection("chats")
+                .whereArrayContains("participants", currentUserId)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+                    for (DocumentSnapshot doc : snapshot) {
+                        String chatId = doc.getId();
+                        List<String> participants = (List<String>) doc.get("participants");
+
+                        if (participants == null || participants.size() != 2) continue;
+
+                        // Find the other participant
+                        String otherUserId = participants.get(0).equals(currentUserId) ? participants.get(1) : participants.get(0);
+
+                        String lastMessage = doc.getString("lastMessage");
+
+                        // Fetch other user details
+                        FirebaseFirestore.getInstance()
+                                .collection("users")
+                                .document(otherUserId)
+                                .get()
+                                .addOnSuccessListener(userDoc -> {
+                                    String name = userDoc.getString("name");
+                                    String imageUrl = userDoc.getString("imageUrl");
+
+                                    ChatListItem item = new ChatListItem(
+                                            chatId,
+                                            otherUserId,
+                                            name,
+                                            imageUrl,
+                                            lastMessage
+                                    );
+
+                                    chatList.add(item);
+                                    adapter.notifyDataSetChanged();
+                                });
+                    }
+                });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            Log.e("TAG", "getChatList: " + firebaseUser.getUid());
+
+            currentUserId = firebaseUser.getUid();
+            db = FirebaseFirestore.getInstance();
+            getChatList(currentUserId);
+        }
+    }
 }

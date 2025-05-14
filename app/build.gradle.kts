@@ -59,12 +59,18 @@ dependencies {
     implementation (libs.ccp)
     implementation (libs.firebase.firestore)
     implementation (libs.firebase.storage)
+    implementation (libs.firebase.messaging)
+    implementation (libs.okhttp)
+
 
     implementation (libs.gson)
     implementation (libs.core.splashscreen)
 
     implementation (libs.circleimageview)
     implementation (libs.glide)
+
+    // agora sdk
+    implementation(libs.full.sdk)
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries

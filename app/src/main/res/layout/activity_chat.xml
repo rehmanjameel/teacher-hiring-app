@@ -6,7 +6,7 @@
     android:padding="10dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ChatActivity">
+    tools:context=".chat.ChatActivity">
 
     <RelativeLayout
         android:id="@+id/topLayout"
@@ -50,6 +50,15 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:id="@+id/startCall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:layout_alignParentEnd="true"
+            android:src="@drawable/baseline_videocam_24"
+            />
 
     </RelativeLayout>
     <androidx.recyclerview.widget.RecyclerView
