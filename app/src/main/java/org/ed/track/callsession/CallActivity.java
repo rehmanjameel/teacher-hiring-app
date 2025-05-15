@@ -46,7 +46,7 @@ public class CallActivity extends AppCompatActivity {
 
     private ActivityCallBinding binding;
 
-    private String myAppId = "";
+    private String myAppId = "cbb2ffa6bfb7439ba732bda7a8f6d626";
     private RtcEngine mRtcEngine;
 
     private String channelName;
