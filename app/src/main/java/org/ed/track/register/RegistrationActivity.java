@@ -2,6 +2,7 @@ package org.ed.track.register;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
@@ -36,9 +37,12 @@ public class RegistrationActivity extends AppCompatActivity {
         binding.autoCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedRole = parent.getItemAtPosition(position).toString();
             if (selectedRole.equals("Teacher")) {
+                Log.e("s teacher..", "yessss");
                 App.saveBoolean("is_teacher", true);
 //                binding.layoutCourse.setVisibility(View.VISIBLE);
             } else {
+                Log.e("s student..", "yessss");
+                App.saveBoolean("is_teacher", false);
                 binding.layoutCourse.setVisibility(View.GONE);
             }
         });

@@ -2,9 +2,6 @@ package org.ed.track.services;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.Random;
 
 public class RtcTokenBuilder {
@@ -28,7 +25,7 @@ public class RtcTokenBuilder {
     }
 
     public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, Role role, int privilegeTs) {
-        String version = "006";
+        String version = "007";
         String nonce = generateRandomString(32);
         int ts = (int) (System.currentTimeMillis() / 1000);
         byte[] signature = generateSignature(appId, appCertificate, channelName, account, ts, privilegeTs, nonce);

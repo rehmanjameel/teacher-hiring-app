@@ -103,9 +103,11 @@ public class StudentDashboard extends AppCompatActivity {
             selectedFragment = new StudentHomeFragment();
         } else if (item.getItemId() == R.id.nav_messages) {
             selectedFragment = new MessagesFragment();
-        } else if (item.getItemId() == R.id.nav_calendar) {
-            selectedFragment = new CalendarFragment();
-        } else if (item.getItemId() == R.id.nav_profile) {
+        }
+//        else if (item.getItemId() == R.id.nav_calendar) {
+//            selectedFragment = new CalendarFragment();
+//        }
+        else if (item.getItemId() == R.id.nav_profile) {
             selectedFragment = new ProfileFragment();
         }
         return selectedFragment;

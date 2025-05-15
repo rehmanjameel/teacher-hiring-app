@@ -155,8 +155,8 @@ public class ProfileActivity extends AppCompatActivity {
         } else {
             intent.putExtra("image_uri", selectedImageUri.toString());
             intent.putExtra("location", location);
+            startActivity(intent);
         }
-        startActivity(intent);
 
     }
 

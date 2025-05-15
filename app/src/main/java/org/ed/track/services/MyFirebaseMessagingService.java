@@ -32,20 +32,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         // Check if message contains data payload.
         if (!remoteMessage.getData().isEmpty()) {
-            // Handle data payload of the message.
             String title = remoteMessage.getData().get("title");
             String message = remoteMessage.getData().get("message");
-            Log.e("notifications1", title + ",.,." + message);
-
-            // Process the message (e.g., show notification).
-            if (title != null && message != null) {
-//                NotificationHelper.showNotification(App.context, title, message);
-                Log.e("notifications 0", title + ",.,." + message);
-
-//                saveUserNotifications(title, message);
-            }
-
+            NotificationHelper.showNotification(App.context, title, message);
         }
+
 
         if (!isDuplicate(remoteMessage.getSentTime())) {
             // send notificaiton here
@@ -55,12 +46,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 // Handle notification payload of the message.
                 String title = remoteMessage.getNotification().getTitle();
                 String body = remoteMessage.getNotification().getBody();
-
-//                if (title.equals("Chat Closed")) {
-//                    Intent intent = new Intent(this, DashBoardActivity.class);
-//                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    startActivity(intent);
-//                }
                 Log.e("notifications2", title + ",.,." + body);
 
                 // Process the notification (e.g., show notification).
@@ -68,22 +53,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                     NotificationHelper.showNotification(App.context, title, body);
                     Log.e("notifications3", title + ",.,." + body);
 
-//                    saveUserNotifications(title, body);
-//                    String chatRoomId;
-//                    String postId;
-//                    // Check if the message contains data payload
-//                    if (remoteMessage.getData().size() > 0) {
-//                        chatRoomId = remoteMessage.getData().get("chatRoomId");
-//                        postId = remoteMessage.getData().get("chatPostId");
-//                        Log.e("chatroom id", chatRoomId);
-//
-//                        // Handle the chat room ID here and navigate user to the chat room
-//                        if (!title.equals("Chat Closed")) {
-//                            if (chatRoomId != null) {
-//                                saveUserPostInvitation(title, body, chatRoomId, postId);
-//                            }
-//                        }
-//                    }
                 }
             }
         }

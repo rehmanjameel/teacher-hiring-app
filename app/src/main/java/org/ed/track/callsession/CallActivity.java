@@ -3,27 +3,28 @@ package org.ed.track.callsession;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+//import org.ed.track.BuildConfig;
 import org.ed.track.R;
 import org.ed.track.databinding.ActivityCallBinding;
-import org.ed.track.services.RtcTokenBuilder;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,24 +34,26 @@ import io.agora.rtc2.IRtcEngineEventHandler;
 import io.agora.rtc2.RtcEngine;
 import io.agora.rtc2.RtcEngineConfig;
 import io.agora.rtc2.video.VideoCanvas;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class CallActivity extends AppCompatActivity {
 
     private ActivityCallBinding binding;
 
     private String myAppId = "";
-    private String appCertificate = "";
     private RtcEngine mRtcEngine;
 
     private String channelName;
 
     int uid = 0; // or unique user ID (integer)
-    int expirationTimeInSeconds = 3600; // 1 hour
-    int currentTimestamp = (int) (System.currentTimeMillis() / 1000);
-    int privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
-    RtcTokenBuilder tokenBuilder = new RtcTokenBuilder();
 
-    String generatedToken;
+    String callToken;
 
     private static final int PERMISSION_REQ_ID = 22;
 
@@ -78,44 +81,96 @@ public class CallActivity extends AppCompatActivity {
 
     }
 
-    private String generateToken() {
-        generatedToken = tokenBuilder.buildTokenWithUid(
-                myAppId,
-                appCertificate,
-                channelName,
-                uid,
-                RtcTokenBuilder.Role.Role_Publisher,
-                privilegeExpiredTs
-        );
-        Log.e("generatedToken", "onCreate: " + generatedToken);
-        return generatedToken;
+    public interface OnTokenReceived {
+        void onTokenReceived(String token);
     }
+
+    private void fetchAgoraToken(String channelName, int uid, OnTokenReceived callback) {
+        OkHttpClient client = new OkHttpClient();
+
+        String url = "http://192.168.1.212:8000/get-token"; // for emulator accessing localhost
+        MediaType JSON = MediaType.get("application/json; charset=utf-8");
+
+        JSONObject json = new JSONObject();
+        try {
+            json.put("channelName", channelName);
+            json.put("uid", uid);
+            json.put("role", "publisher");
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        RequestBody body = RequestBody.create(json.toString(), JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                Log.e("AgoraToken", "Request failed: " + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    Log.e("AgoraToken", "Unexpected code " + response);
+                    return;
+                }
+
+                String resBody = response.body().string();
+                try {
+                    JSONObject resJson = new JSONObject(resBody);
+                    String token = resJson.getString("token");
+
+
+                    // Run on UI thread to update UI or join channel
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        callback.onTokenReceived(token);
+                    });
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
 
     private void findOrSaveToken() {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("calls").document(channelName).get().addOnSuccessListener(doc -> {
-            String token;
+
             Log.e("doc.exists()", "findOrSaveToken: " + doc.exists());
             if (doc.exists()) {
-                token = doc.getString("token");
+                String getToken = doc.getString("token");
+                callToken = doc.getString("token");
+                if (checkPermissions()) {
+                    startVideoCalling(channelName, getToken, uid); // initializes and sets up video
+                } else {
+                    requestPermissions(); // handle permission flow separately
+                }
             } else {
-                token = generateToken();
-                Map<String, Object> data = new HashMap<>();
-                data.put("token", token);
-                data.put("channelName", channelName);
-                data.put("createdAt", FieldValue.serverTimestamp());
-                db.collection("calls").document(channelName).set(data);
-            }
+                fetchAgoraToken(channelName, 0, token -> {
 
-            final String finalToken = token;
-            Log.e("doc.exists()", "findOrSaveToken: " + channelName + "toen " + finalToken);
+                    callToken = token;
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("token", token);
+                    data.put("channelName", channelName);
+                    data.put("createdAt", FieldValue.serverTimestamp());
+                    db.collection("calls").document(channelName).set(data);
+                    Log.e("doc.exists()", "findOrSaveToken: " + channelName + "toen " + token);
 
-            if (checkPermissions()) {
-                startVideoCalling(); // initializes and sets up video
-                joinChannel(channelName, finalToken); // join after setup
-            } else {
-                requestPermissions(); // handle permission flow separately
+                    if (checkPermissions()) {
+                        startVideoCalling(channelName, token, uid); // initializes and sets up video
+                    } else {
+                        requestPermissions(); // handle permission flow separately
+                    }
+                });
             }
         });
     }
@@ -152,14 +207,14 @@ public class CallActivity extends AppCompatActivity {
      * <p>
      * Channel media options: Configure ChannelMediaOptions to define publishing and subscription settings, optimize performance for your specific use-case, and set optional parameters.
      **/
-    private void joinChannel(String channelName, String token) {
+    private void joinChannel(String channelName, String token, int uid) {
         ChannelMediaOptions options = new ChannelMediaOptions();
         options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER;
         options.channelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION;
         options.publishCameraTrack = true;
         options.publishMicrophoneTrack = true;
         Log.e("channelName", "joinChannel: " + channelName + "token " + token);
-        mRtcEngine.joinChannel(token, channelName, 0, options);
+        mRtcEngine.joinChannel(token, channelName, uid, options);
     }
 
     /**
@@ -280,14 +335,16 @@ public class CallActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSION_REQ_ID && checkPermissions()) {
-            startVideoCalling();
+            startVideoCalling(channelName, callToken, uid);
         }
     }
 
-    private void startVideoCalling() {
+    private void startVideoCalling(String channelName, String token, int uid) {
         initializeAgoraVideoSDK();
         enableVideo();
         setupLocalVideo();
+        joinChannel(channelName, token, uid); // join after setup
+
     }
 
     private void cleanupAgoraEngine() {

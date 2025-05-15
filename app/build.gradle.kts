@@ -1,7 +1,12 @@
+
 plugins {
     alias(libs.plugins.android.application)
     id("com.google.gms.google-services")
 }
+
+//def apikeyPropertiesFile = rootProject.file("apikey.properties")
+//def apikeyProperties = new Properties()
+//apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
 
 android {
     namespace = "org.ed.track"
@@ -15,7 +20,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "AGORA_APP_ID", "\"${project.properties["AGORA_APP_ID"]}\"")
     }
+    android.buildFeatures.buildConfig = true
 
     buildTypes {
         release {
@@ -46,7 +54,6 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-
     // Import the Firebase BoM
     implementation(platform(libs.firebase.bom))
 
@@ -61,6 +68,7 @@ dependencies {
     implementation (libs.firebase.storage)
     implementation (libs.firebase.messaging)
     implementation (libs.okhttp)
+    implementation (libs.okio)
 
 
     implementation (libs.gson)

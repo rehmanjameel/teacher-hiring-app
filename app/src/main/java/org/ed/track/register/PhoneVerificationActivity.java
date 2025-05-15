@@ -131,6 +131,7 @@ public class PhoneVerificationActivity extends AppCompatActivity {
             return;
         }
 
+        binding.progressBar.setVisibility(View.VISIBLE);
         PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
         signInWithCredential(credential);
     }
