@@ -21,7 +21,6 @@ public class RegistrationActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
         // Get reference to the string array defined in res/values/strings.xml
         String[] roles = getResources().getStringArray(R.array.role);
 
@@ -47,7 +46,6 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         });
 
-
         // Handle Register button click
         binding.btnRegister.setOnClickListener(view -> {
             getDetails();
@@ -63,7 +61,6 @@ public class RegistrationActivity extends AppCompatActivity {
         String name = binding.etName.getText().toString().trim();
         String email = binding.etEmail.getText().toString().trim();
         String password = binding.etPassword.getText().toString().trim();
-//        String course = binding.etCourse.getText().toString().trim();
         String role = binding.autoCompleteTextView.getText().toString().trim();
         String phone = binding.etPhone.getText().toString().trim();
 
@@ -75,10 +72,6 @@ public class RegistrationActivity extends AppCompatActivity {
             binding.etPhone.setError(password.isEmpty() ? "Required" : null);
             return;
         }
-
-//        if (role.equals("Teacher") && course.isEmpty()) {
-//            binding.etCourse.setError("Course is required for teachers");
-//        } else {
             Intent intent = new Intent(this, ProfileActivity.class);
             intent.putExtra("name", name);
             intent.putExtra("email", email);
@@ -87,10 +80,7 @@ public class RegistrationActivity extends AppCompatActivity {
             intent.putExtra("phone", binding.ccp.getSelectedCountryCodeWithPlus() + phone);
             startActivity(intent);
             finish();
-//        }
 
-        // Proceed with registration logic (e.g., save to Firebase or send to server)
-        // For now, just show a success message (you can replace with actual logic)
-        // Toast.makeText(this, role + " registered successfully!", Toast.LENGTH_SHORT).show();
+
     }
 }

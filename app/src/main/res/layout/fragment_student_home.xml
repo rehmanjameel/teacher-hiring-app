@@ -17,7 +17,7 @@
             android:layout_height="100dp"
             android:layout_marginTop="40dp"
             android:padding="10dp"
-            android:background="@android:color/holo_blue_light"
+            android:background="@color/button_color"
             android:orientation="vertical">
 
             <TextView

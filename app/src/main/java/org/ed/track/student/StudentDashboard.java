@@ -150,7 +150,7 @@ public class StudentDashboard extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        fetchUserProfile();
+//        fetchUserProfile();
         getFCMToken();
     }
 
@@ -162,6 +162,7 @@ public class StudentDashboard extends AppCompatActivity {
                     String token = task.getResult();
                     Log.e("tokeen", token);
 //                    Toast.makeText(MainActivity.this, "token: " + token, Toast.LENGTH_SHORT).show();
+                    Log.e("token user", App.getString("user_id"));
 
                     saveTokenToFireStore(App.getString("user_id"), token);
 

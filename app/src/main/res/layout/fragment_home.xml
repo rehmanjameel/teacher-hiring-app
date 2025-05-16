@@ -1,6 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -9,7 +10,7 @@
         android:layout_height="100dp"
         android:layout_marginTop="40dp"
         android:padding="10dp"
-        android:background="@android:color/holo_blue_light"
+        android:background="@color/button_color"
         android:orientation="vertical">
 
         <TextView
@@ -30,14 +31,18 @@
             android:src="@drawable/baseline_videocam_24"
             />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAddCourse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:cornerRadius="10dp"
+            app:backgroundTint="@color/colorAccent"
+            android:text="Add New Course" />
+
     </LinearLayout>
 
-    <Button
-        android:id="@+id/btnAddCourse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Add New Course"
-        android:layout_marginTop="12dp"/>
+
 
     <TextView
         android:layout_width="wrap_content"

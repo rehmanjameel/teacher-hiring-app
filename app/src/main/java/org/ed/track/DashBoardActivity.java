@@ -94,7 +94,7 @@ public class DashBoardActivity extends AppCompatActivity {
     }
 
 
-    private void fetchUserProfile() {
+    private void fetchTeacherProfile() {
         String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         FirebaseFirestore.getInstance().collection("users")
@@ -133,6 +133,7 @@ public class DashBoardActivity extends AppCompatActivity {
                     Log.e("tokeen", token);
 //                    Toast.makeText(MainActivity.this, "token: " + token, Toast.LENGTH_SHORT).show();
 
+                    Log.e("token user", App.getString("user_id"));
                     saveTokenToFireStore(App.getString("user_id"), token);
 
                 }
@@ -158,7 +159,7 @@ public class DashBoardActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        fetchUserProfile();
+//        fetchUserProfile();
         getFCMToken();
     }
 }

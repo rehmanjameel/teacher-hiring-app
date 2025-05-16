@@ -13,7 +13,7 @@
         android:layout_height="200dp"
         android:layout_marginTop="40dp"
         android:orientation="horizontal"
-        android:background="@color/colorAccent">
+        android:background="@color/button_color">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profileImage"
@@ -24,11 +24,13 @@
             android:layout_centerInParent="true"/>
 
         <ImageView
+            android:id="@+id/editProfile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/baseline_edit_24"
             android:layout_alignParentEnd="true"
-            android:padding="10dp"/>
+            android:padding="10dp"
+            app:tint="@color/white" />
 
         <TextView
             android:id="@+id/userName"
@@ -37,6 +39,8 @@
             android:text="Username"
             android:layout_below="@id/profileImage"
             android:layout_centerHorizontal="true"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             android:layout_marginTop="10dp"/>
 
     </RelativeLayout>
@@ -118,10 +122,14 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/logoutBtn"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"
+        app:cornerRadius="10dp"
+        app:icon="@drawable/baseline_logout_24"
+        android:layout_centerHorizontal="true"
+        android:backgroundTint="@color/red"
         android:text="Logout"/>
 
 </RelativeLayout>

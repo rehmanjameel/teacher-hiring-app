@@ -80,6 +80,10 @@ public class AddCourseActivity extends AppCompatActivity {
 
         binding.btnAddCourse.setOnClickListener(v -> checkFields());
 
+        binding.back.setOnClickListener(view -> {
+            onBackPressed();
+        });
+
     }
 
     private void checkFields() {

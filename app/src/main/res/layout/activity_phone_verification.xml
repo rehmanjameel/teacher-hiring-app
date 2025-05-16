@@ -83,13 +83,14 @@
                 <!-- Register Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnVerify"
-                    android:layout_width="wrap_content"
+                    android:layout_width="300dp"
                     android:layout_height="wrap_content"
                     android:text="Verify Otp"
                     android:layout_marginTop="24dp"
                     android:layout_gravity="center"
+                    app:cornerRadius="10dp"
                     style="@style/Widget.MaterialComponents.Button"
-                    android:backgroundTint="?attr/colorPrimary"
+                    android:backgroundTint="@color/button_color"
                     android:textColor="@android:color/white"/>
 
             </LinearLayout>

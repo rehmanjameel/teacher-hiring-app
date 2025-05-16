@@ -67,6 +67,7 @@ dependencies {
     implementation (libs.firebase.firestore)
     implementation (libs.firebase.storage)
     implementation (libs.firebase.messaging)
+    implementation(libs.firebase.functions)
     implementation (libs.okhttp)
     implementation (libs.okio)
 
@@ -79,6 +80,9 @@ dependencies {
 
     // agora sdk
     implementation(libs.full.sdk)
+
+    //stripe
+    implementation (libs.stripe.android)
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries

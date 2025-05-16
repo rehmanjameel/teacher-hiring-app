@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -17,6 +18,7 @@ import com.bumptech.glide.Glide;
 import org.ed.track.chat.ChatActivity;
 import org.ed.track.R;
 import org.ed.track.model.UserProfile;
+import org.ed.track.student.TeacherCoursesActivity;
 
 import java.util.List;
 
@@ -67,6 +69,14 @@ public class RecommendedTeacherAdapter extends RecyclerView.Adapter<RecommendedT
             context.startActivity(intent);
         });
 
+        holder.teacherClick.setOnClickListener(view -> {
+            // Handle teacher click
+            Intent intent = new Intent(context, TeacherCoursesActivity.class);
+            intent.putExtra("teacher_id", teacher.getUserId());
+            intent.putExtra("teacher_name", teacher.getName());
+            context.startActivity(intent);
+        });
+
     }
 
     @Override
@@ -78,6 +88,7 @@ public class RecommendedTeacherAdapter extends RecyclerView.Adapter<RecommendedT
         TextView nameText, areaText, qualificationText;
         CircleImageView profileImage;
         ImageView messageTeacher;
+        CardView teacherClick;
 
         public TeacherViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -86,6 +97,7 @@ public class RecommendedTeacherAdapter extends RecyclerView.Adapter<RecommendedT
             qualificationText = itemView.findViewById(R.id.teacher_qualification);
             profileImage = itemView.findViewById(R.id.teacher_image);
             messageTeacher = itemView.findViewById(R.id.messageTeacher);
+            teacherClick = itemView.findViewById(R.id.teacherClick);
         }
     }
 }

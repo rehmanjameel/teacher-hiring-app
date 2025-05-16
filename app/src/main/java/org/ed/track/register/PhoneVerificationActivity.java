@@ -212,16 +212,11 @@ public class PhoneVerificationActivity extends AppCompatActivity {
             db.collection("users").document(uid)
                     .set(userData)
                     .addOnSuccessListener(aVoid -> {
-                        binding.progressBar.setVisibility(View.GONE);
 
                         // Navigate to next screen
                         Toast.makeText(this, "User registered successfully", Toast.LENGTH_SHORT).show();
                         App.saveLogin(true);
-                        if (App.getBoolean("is_teacher"))
-                            startActivity(new Intent(this, DashBoardActivity.class));
-                        else
-                            startActivity(new Intent(this, StudentDashboard.class));
-                        finish();
+                        fetchUserProfileForLogin(phone);
 
                     })
                     .addOnFailureListener(e -> {
@@ -257,19 +252,26 @@ public class PhoneVerificationActivity extends AppCompatActivity {
                                 App.saveString("qualification", userDoc.getString("qualification"));
                                 App.saveString("bio", userDoc.getString("bio"));
                                 App.saveString("availableTime", userDoc.getString("availableTime"));
-                                startActivity(new Intent(this, DashBoardActivity.class));
+                                startActivity(new Intent(this, DashBoardActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
+                                finish();
                             } else {
                                 App.saveBoolean("is_teacher", false);
                                 App.saveString("budget", userDoc.getString("budget"));
                                 App.saveString("subject", userDoc.getString("subject"));
-                                startActivity(new Intent(this, StudentDashboard.class));
+                                startActivity(new Intent(this, StudentDashboard.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                        .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
+                                finish();
                             }
+                            binding.progressBar.setVisibility(View.GONE);
 
                         }
                     }
                 }).addOnFailureListener(e -> {
+                    binding.progressBar.setVisibility(View.GONE);
+
                     Toast.makeText(App.getContext(), "Failed to load profile: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
 

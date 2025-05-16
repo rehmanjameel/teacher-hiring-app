@@ -19,6 +19,7 @@ import org.ed.track.R;
 import org.ed.track.model.UserProfile;
 import org.ed.track.databinding.FragmentProfileBinding;
 import org.ed.track.register.LoginActivity;
+import org.ed.track.register.UpdateProfile;
 import org.ed.track.utils.App;
 
 public class ProfileFragment extends Fragment {
@@ -49,7 +50,6 @@ public class ProfileFragment extends Fragment {
         super.onResume();
         user = new UserProfile();
 
-
         binding.userName.setText(App.getString("name"));
         binding.emailTxt.setText(App.getString("email"));
         binding.locationTxt.setText(App.getString("location"));
@@ -60,6 +60,10 @@ public class ProfileFragment extends Fragment {
         // Load profile image (e.g., using Glide)
         Glide.with(this).load(App.getString("profileImageUrl")).error(R.drawable.baseline_person_24).into(binding.profileImage);
 
+        binding.editProfile.setOnClickListener(view -> {
+            startActivity(new Intent(App.getContext(), UpdateProfile.class));
+
+        });
     }
 
     private void fetchUserProfile() {

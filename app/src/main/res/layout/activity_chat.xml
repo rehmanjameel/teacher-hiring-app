@@ -60,6 +60,17 @@
             android:src="@drawable/baseline_videocam_24"
             />
 
+        <ImageView
+            android:id="@+id/pay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:visibility="gone"
+            android:layout_toStartOf="@id/startCall"
+            android:src="@drawable/baseline_payment_24"
+            app:tint="@color/button_color"
+            />
+
     </RelativeLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_chat"

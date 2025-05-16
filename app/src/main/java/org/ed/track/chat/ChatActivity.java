@@ -2,6 +2,8 @@ package org.ed.track.chat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,6 +16,7 @@ import org.ed.track.adapter.ChatAdapter;
 import org.ed.track.callsession.CallActivity;
 import org.ed.track.databinding.ActivityChatBinding;
 import org.ed.track.model.ChatMessage;
+import org.ed.track.payment.StripePaymentActivity;
 import org.ed.track.utils.App;
 
 import java.util.ArrayList;
@@ -52,11 +55,13 @@ public class ChatActivity extends AppCompatActivity {
         binding.recyclerChat.setAdapter(chatAdapter);
         binding.recyclerChat.setLayoutManager(new LinearLayoutManager(this));
 
+        Log.e("sender recerive", senderId + ",.,." + receiverId);
         binding.btnSend.setOnClickListener(v -> sendMessage());
 
+
+        binding.startCall.setVisibility(View.VISIBLE);
         binding.startCall.setOnClickListener(view -> {
             Intent intent = new Intent(App.getContext(), CallActivity.class);
-            intent.putExtra("channel_name", callChannelName);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             App.getContext().startActivity(intent);
         });
@@ -66,6 +71,21 @@ public class ChatActivity extends AppCompatActivity {
         binding.back.setOnClickListener(view -> {
             onBackPressed();
         });
+
+        if (App.getString("role").equals("Student")) {
+            binding.pay.setVisibility(View.VISIBLE);
+
+            binding.pay.setOnClickListener(view -> {
+                Intent intent = new Intent(App.getContext(), StripePaymentActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra("teacher_id", receiverId);
+                App.getContext().startActivity(intent);
+            });
+        } else {
+            binding.pay.setVisibility(View.GONE);
+
+        }
+
     }
 
     private String getChatId(String id1, String id2) {

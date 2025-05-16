@@ -194,13 +194,15 @@
             <!-- Register Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRegister"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:text="Continue"
                 android:layout_below="@id/layoutCourse"
                 android:layout_marginTop="16dp"
+                app:cornerRadius="10dp"
+                android:layout_centerHorizontal="true"
                 style="@style/Widget.MaterialComponents.Button"
-                android:backgroundTint="?attr/colorPrimary"
+                android:backgroundTint="@color/button_color"
                 android:textColor="@android:color/white"/>
 
         </RelativeLayout>

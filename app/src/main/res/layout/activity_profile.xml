@@ -162,11 +162,13 @@
             <!-- Continue Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnContinue"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:text="Continue"
                 android:layout_marginTop="20dp"
-                android:backgroundTint="?attr/colorPrimary"
+                app:cornerRadius="10dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/button_color"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
